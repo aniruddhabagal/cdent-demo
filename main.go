@@ -10,6 +10,8 @@ func main() {
 	config := NewAppConfig()
 	logger := logrus.New()
 
+	logger.SetLevel(logrus.DebugLevel)
+
 	s := NewServer(logger, config)
 	s.Initialize()
 	s.Listen()

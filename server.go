@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cdent/users"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -30,7 +31,8 @@ func NewServer(logger *logrus.Logger, config *AppConfig) *Server {
 
 func (s *Server) Initialize() {
 	s.addRoute()
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Kolkata",
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Kolkata",
 		s.config.DBHost,
 		s.config.DBUser,
 		s.config.DBPassword,
@@ -45,10 +47,27 @@ func (s *Server) Initialize() {
 	s.logger.Infof("Connected to DataBase: %s", dsn)
 	s.DB = db
 
+	err = runMigration(s.logger,s.config)
+
+	if err != nil {
+		s.logger.WithError(err).Panic("Failed to run Migrations")
+	}
+	s.addRoute()
+
+
 }
 
 func (s *Server) addRoute() {
-	s.router.HandleFunc("/", hello).Methods(http.MethodGet)
+	s.router.StrictSlash(true)
+
+	ur := users.NewRepository(s.DB)
+	uh := users.NewHandler(s.logger, ur)
+
+	s.router.HandleFunc("/users", uh.Create).Methods(http.MethodPost)
+	s.router.HandleFunc("/users", uh.GetAll).Methods(http.MethodGet)
+	s.router.HandleFunc("/user/{id}", uh.Update).Methods(http.MethodPost)
+	s.router.HandleFunc("/user/{id}", uh.Delete).Methods(http.MethodDelete)
+	s.router.HandleFunc("/user/{id}", uh.Get).Methods(http.MethodGet)
 }
 
 func (s *Server) Listen() {
