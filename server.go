@@ -30,7 +30,7 @@ func NewServer(logger *logrus.Logger, config *AppConfig) *Server {
 }
 
 func (s *Server) Initialize() {
-	s.addRoute()
+
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Kolkata",
 		s.config.DBHost,
@@ -43,17 +43,18 @@ func (s *Server) Initialize() {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		s.logger.WithError(err).Error("Failed to Connect to DataBase")
+		return
 	}
 	s.logger.Infof("Connected to DataBase: %s", dsn)
 	s.DB = db
 
-	err = runMigration(s.logger,s.config)
+	err = runMigration(s.logger, s.config)
 
 	if err != nil {
 		s.logger.WithError(err).Panic("Failed to run Migrations")
+		return
 	}
 	s.addRoute()
-
 
 }
 

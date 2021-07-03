@@ -10,17 +10,16 @@ import (
 	"strconv"
 )
 
-type Handler struct{
-	logger *logrus.Logger
+type Handler struct {
+	logger     *logrus.Logger
 	repository *Repository
-	
 }
 
 func NewHandler(logger *logrus.Logger, repository *Repository) *Handler {
 	return &Handler{logger: logger, repository: repository}
 }
 
-func(h *Handler) Create(w http.ResponseWriter, r *http.Request){
+func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	user := &User{}
 
 	err := json.NewDecoder(r.Body).Decode(user)
@@ -71,7 +70,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func(h *Handler) GetAll(w http.ResponseWriter, r *http.Request){
+func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	users, err := h.repository.GetAll()
 
 	if err != nil {
@@ -80,20 +79,20 @@ func(h *Handler) GetAll(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	json.NewEncoder(w).Encode(users)
+	err = json.NewEncoder(w).Encode(users)
 	if err != nil {
-
+		h.logger.WithError(err).Error("Error is here")
 	}
 }
 
-func(h *Handler) Delete(w http.ResponseWriter, r *http.Request){
+func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	// TODO:
 	// 1. Read json request to a user variable
 	// 2. Call the repository Delete function
 
 }
 
-func(h *Handler) Update(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 
 	// TODO:
 	// 1. Read json request to a user variable
