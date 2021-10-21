@@ -619,8 +619,8 @@ hr
 small,
 .small
 {
-    font-size: 80%;
-    font-weight: 400;
+    font-size: 120%;
+    font-weight: 600;
 }
 
 mark,
@@ -15430,7 +15430,7 @@ button.bg-darker:focus
     .pb-lg-5,
     .py-lg-5
     {
-        padding-bottom: 3rem !important;
+        padding-bottom: 0rem !important;
     }
     .pl-lg-5,
     .px-lg-5
